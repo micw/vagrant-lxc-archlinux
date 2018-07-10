@@ -1,0 +1,8 @@
+---
+
+sudo: required
+dist: trusty
+language: python
+python: '3.5'
+
+script: sudo /bin/bash build.sh
