@@ -15,7 +15,7 @@ export PACMAN_VERSION=5.1.1
 
 info "Installing required packages"
 apt update
-apt install -y pkg-config libssl-dev libarchive-dev curl wget build-essential m4
+apt install -y pkg-config libssl-dev libarchive-dev curl wget build-essential m4 psmisc
 
 info "Compiling arch-install-scripts and pacman"
 rm -rf work
@@ -47,8 +47,20 @@ pacstrap -c work/rootfs pacman \
 
 info "Configuring base system for vagrant-lxc usage"
 
+#mount -o bind /dev work/rootfs/dev
+#chroot work/rootfs pacman-key --init
+#chroot work/rootfs pacman-key --populate archlinux
+#killall -9 dirmngr gpg-agent || true
+#umount work/rootfs/dev
+
 chroot work/rootfs useradd -m vagrant
 chroot work/rootfs systemctl enable sshd
+
+cp pacman-init.service work/rootfs/usr/lib/systemd/system/pacman-init.service
+chmod 0755 work/rootfs/usr/lib/systemd/system/pacman-init.service
+chroot work/rootfs systemctl enable pacman-init
+
+cat systemd-firstboot.service > work/rootfs/usr/lib/systemd/system/systemd-firstboot.service
 
 mkdir -p work/rootfs/home/vagrant/.ssh
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key" \
@@ -61,6 +73,8 @@ echo "vagrant-lxc-archlinux" > work/rootfs/etc/hostname
 chown 1000.1000 work/rootfs/home/vagrant -R
 
 rm -rf work/rootfs/var/cache/pacman/pkg/*
+rm -rf work/rootfs/etc/pacman.d/gnupg
+rm -rf work/rootfs/etc/machine-id
 
 info "Packing rootfs"
 
