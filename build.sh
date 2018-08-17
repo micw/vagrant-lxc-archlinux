@@ -4,6 +4,7 @@ set -e
 
 export PACMAN_VERSION=5.1.1
 
+apt update
 apt install pkg-config libssl-dev libarchive-dev
 
 rm -rf work
