@@ -4,11 +4,13 @@ set -e
 
 export PACMAN_VERSION=5.1.1
 
+apt install pkg-config libssl-dev libarchive-dev
+
 rm -rf work
 mkdir work
 mkdir work/rootfs
-(cd work && curl -s https://git.archlinux.org/arch-install-scripts.git/snapshot/arch-install-scripts-18.tar.gz | tar xfvz -)
-(cd work/arch-install-scripts-18 && make)
+#(cd work && curl -s https://git.archlinux.org/arch-install-scripts.git/snapshot/arch-install-scripts-18.tar.gz | tar xfvz -)
+#(cd work/arch-install-scripts-18 && make)
 (cd work && curl -s https://sources.archlinux.org/other/pacman/pacman-${PACMAN_VERSION}.tar.gz | tar xfvz -)
 (cd work/pacman-${PACMAN_VERSION} && ./configure --prefix=/)
 (cd work/pacman-${PACMAN_VERSION} && make && make install)
