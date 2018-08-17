@@ -57,6 +57,8 @@ echo "nameserver 8.8.8.8" > work/rootfs/etc/resolv.conf
 echo -e "127.0.0.1  localhost\n 127.0.1.1  vagrant-lxc-archlinux" > work/rootfs/etc/hosts
 echo "vagrant-lxc-archlinux" > work/rootfs/etc/hostname
 
+chown 1000.1000 work/rootfs/home/vagrant -R
+
 rm -rf work/rootfs/var/cache/pacman/pkg/*
 
 info "Packing rootfs"
