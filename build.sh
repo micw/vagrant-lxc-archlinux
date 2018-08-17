@@ -42,7 +42,8 @@ pacstrap -c work/rootfs pacman \
   grep gzip inetutils iproute2 less licenses logrotate \
   netctl pacman procps-ng psmisc s-nail sed shadow \
   sysfsutils tar util-linux which \
-  sudo openssh ca-certificates curl wget
+  sudo openssh ca-certificates curl wget \
+  python-simplejson
 
 info "Configuring base system for vagrant-lxc usage"
 
