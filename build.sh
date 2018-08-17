@@ -5,23 +5,25 @@ set -e
 export PACMAN_VERSION=5.1.1
 
 apt update
-apt install pkg-config libssl-dev libarchive-dev
+apt install -y pkg-config libssl-dev libarchive-dev curl wget build-essential m4
 
 rm -rf work
 mkdir work
 mkdir work/rootfs
-#(cd work && curl -s https://git.archlinux.org/arch-install-scripts.git/snapshot/arch-install-scripts-18.tar.gz | tar xfvz -)
-#(cd work/arch-install-scripts-18 && make)
-(cd work && curl -s https://sources.archlinux.org/other/pacman/pacman-${PACMAN_VERSION}.tar.gz | tar xfvz -)
-(cd work/pacman-${PACMAN_VERSION} && ./configure --prefix=/)
-(cd work/pacman-${PACMAN_VERSION} && make && make install)
-(cd work/pacman-${PACMAN_VERSION}/src/pacman && make && make install)
+(cd work && curl -s https://git.archlinux.org/arch-install-scripts.git/snapshot/arch-install-scripts-18.tar.gz | tar xfvz -)
+(cd work/arch-install-scripts-18 && make && make install)
+if [ ! -f /bin/pacman ]; then
+  (cd work && curl -s https://sources.archlinux.org/other/pacman/pacman-${PACMAN_VERSION}.tar.gz | tar xfvz -)
+  (cd work/pacman-${PACMAN_VERSION} && ./configure --prefix=/)
+  (cd work/pacman-${PACMAN_VERSION} && make && make install)
+  (cd work/pacman-${PACMAN_VERSION}/src/pacman && make && make install)
+fi
 
 cp pacman.conf /etc/pacman.conf
 mkdir -p /etc/pacman.d/
 echo 'Server = http://mirrors.kernel.org/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
 
-pacman -Syu --noconfirm -r work/rootfs pacman \
+pacstrap -c work/rootfs pacman \
   filesystem systemd-sysvcompat bash bzip2 coreutils \
   diffutils file findutils gawk gcc-libs gettext glibc \
   grep gzip inetutils iproute2 less licenses logrotate \
