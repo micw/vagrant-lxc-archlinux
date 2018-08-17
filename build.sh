@@ -2,11 +2,22 @@
 
 set -e
 
+info() {
+	echo
+	echo "============================================================="
+	echo "==="
+	echo "=== $*"
+	echo "==="
+	echo
+}
+
 export PACMAN_VERSION=5.1.1
 
+info "Installing required packages"
 apt update
 apt install -y pkg-config libssl-dev libarchive-dev curl wget build-essential m4
 
+info "Compiling arch-install-scripts and pacman"
 rm -rf work
 mkdir work
 mkdir work/rootfs
@@ -19,6 +30,8 @@ if [ ! -f /bin/pacman ]; then
   (cd work/pacman-${PACMAN_VERSION}/src/pacman && make && make install)
 fi
 
+info "Installing arch base system to work/rootfs"
+
 cp pacman.conf /etc/pacman.conf
 mkdir -p /etc/pacman.d/
 echo 'Server = http://mirrors.kernel.org/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
@@ -30,6 +43,8 @@ pacstrap -c work/rootfs pacman \
   netctl pacman procps-ng psmisc s-nail sed shadow \
   sysfsutils tar util-linux which \
   sudo openssh ca-certificates curl wget
+
+info "Configuring base system for vagrant-lxc usage"
 
 chroot work/rootfs useradd -m vagrant
 chroot work/rootfs systemctl enable sshd
@@ -44,6 +59,8 @@ echo "vagrant-lxc-archlinux" > work/rootfs/etc/hostname
 
 rm -rf work/rootfs/var/cache/pacman/pkg/*
 
+info "Packing rootfs"
+
 tar --numeric-owner -czf work/rootfs.tar.gz -C work ./rootfs
 
 cat << EOF >  work/metadata.json
@@ -55,4 +72,8 @@ EOF
 
 cp lxc-config work/lxc-config
 
+info "Packing box"
+
 tar -czf work/archlinux.box -C work rootfs.tar.gz lxc-config metadata.json
+
+info "Done."

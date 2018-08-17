@@ -6,3 +6,14 @@ language: python
 python: '3.5'
 
 script: sudo /bin/bash build.sh
+
+deploy:
+  provider: releases
+  api_key:
+    secure: MNWTUQulITLUddvkVfSFdtkaVHlqm69LbJZJFWwNDxQ54w1IaTKbulF0E6grBCfZGwo8/+QYhBkZKqPc7c6swRm399fixAuxlahCV2IJQMyC4OrzO8e10uIKv5b/odV4JLxxyCUmeCJdK3CWp4ps4kbit/rtCd27WfLmFUCScdYY2L5V6BifOfbd6Jym9v/0HsTEEhpxis6jnn68f8cQ2xaIQBvmZdb5EiA+uZhEpcXGqIrkC4k0lMgbkMm87lBNWEJpwXgytPY1hHawHHnDBBrORPWILY7gAXkvl29TDNxMjRJvUnzZFrbgU4hNxBxupD1n70j4E/WNk1i1cEOplc5qgFwI0lAijS38rcOygp2upDZ0qYC7k5pNl/V/pptjG5IAu8kC5qM3vm7zglcVoia9TS8WC9t/403YgBdWc6dN+IJC6Rbb/ge46tvjGPvEMD+89eySudi/0Z6edvwcOD5tpxSw89XJn1/lnLQqyGY/tlJ7U0YUR9Njt9Oi4aezx8pIsJFso9YnWOsvC9yG5XMJtaqFkOB6rY7y04BD0fA0IFtZ3NV72Dd48Q1WY0CTmNQqbCQpT+Wt4OH+vysbhRuT7jHqi8sKN+53ENjG0nCi7X7+MbtbWJA1wVliaYP+/fOEjbjvQ6fN1KoD9GHHDOA5/JvgUVsVRnRrP+uRvQw=
+  file: work/*.box
+  file_glob: true
+  skip_cleanup: true
+  on:
+    repo: micw/vagrant-lxc-archlinux
+    tags: true
