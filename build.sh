@@ -43,23 +43,26 @@ pacstrap -c work/rootfs pacman \
   netctl pacman procps-ng psmisc s-nail sed shadow \
   sysfsutils tar util-linux which \
   sudo openssh ca-certificates curl wget \
-  python-simplejson
+  python-simplejson git base-devel \
+  pacutils perl perl-libwww perl-term-ui perl-json \
+  perl-data-dump perl-lwp-protocol-https perl-term-readline-gnu \
+  perl-json-xs
 
 info "Configuring base system for vagrant-lxc usage"
 
-#mount -o bind /dev work/rootfs/dev
-#chroot work/rootfs pacman-key --init
-#chroot work/rootfs pacman-key --populate archlinux
-#killall -9 dirmngr gpg-agent || true
-#umount work/rootfs/dev
+mount -o bind /dev work/rootfs/dev
+mount -t proc none work/rootfs/proc
+chroot work/rootfs pacman-key --init
+chroot work/rootfs pacman-key --populate archlinux
+killall -9 dirmngr gpg-agent || true
 
-chroot work/rootfs useradd -m vagrant
+chroot work/rootfs useradd -u 2000 -m vagrant
 chroot work/rootfs systemctl enable sshd
+chroot work/rootfs trust extract-compat
 
 cp pacman-init.service work/rootfs/usr/lib/systemd/system/pacman-init.service
 chmod 0755 work/rootfs/usr/lib/systemd/system/pacman-init.service
 chroot work/rootfs systemctl enable pacman-init
-
 cat systemd-firstboot.service > work/rootfs/usr/lib/systemd/system/systemd-firstboot.service
 
 mkdir -p work/rootfs/home/vagrant/.ssh
@@ -70,11 +73,22 @@ echo "nameserver 8.8.8.8" > work/rootfs/etc/resolv.conf
 echo -e "127.0.0.1  localhost\n 127.0.1.1  vagrant-lxc-archlinux" > work/rootfs/etc/hosts
 echo "vagrant-lxc-archlinux" > work/rootfs/etc/hostname
 
-chown 1000.1000 work/rootfs/home/vagrant -R
+chown 2000.2000 work/rootfs/home/vagrant -R
+
+sed -i 's/CheckSpace/#CheckSpace/' work/rootfs/etc/pacman.conf
+chroot work/rootfs su vagrant -c "git clone https://aur.archlinux.org/trizen.git /tmp/trizen"
+chroot work/rootfs su vagrant -c "cd /tmp/trizen && makepkg -si --noconfirm"
+sed -i 's/#CheckSpace/CheckSpace/' work/rootfs/etc/pacman.conf
+
+
+sleep 1
+umount work/rootfs/dev
+umount work/rootfs/proc
 
 rm -rf work/rootfs/var/cache/pacman/pkg/*
 rm -rf work/rootfs/etc/pacman.d/gnupg
 rm -rf work/rootfs/etc/machine-id
+rm -rf work/rootfs/tmp/*
 
 info "Packing rootfs"
 
