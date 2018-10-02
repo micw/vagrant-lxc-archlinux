@@ -61,9 +61,20 @@ chroot work/rootfs systemctl enable sshd
 chroot work/rootfs trust extract-compat
 
 cp pacman-init.service work/rootfs/usr/lib/systemd/system/pacman-init.service
-chmod 0755 work/rootfs/usr/lib/systemd/system/pacman-init.service
+cp systemd-firstboot.service work/rootfs/usr/lib/systemd/system/systemd-firstboot.service
+cp rc-local.service work/rootfs/usr/lib/systemd/system/rc-local.service
+cp rc.local work/rootfs/etc/rc.local
+
+chmod 0755 \
+  work/rootfs/usr/lib/systemd/system/pacman-init.service \
+  work/rootfs/usr/lib/systemd/system/systemd-firstboot.service \
+  work/rootfs/usr/lib/systemd/system/rc-local.service \
+  work/rootfs/etc/rc.local
+
 chroot work/rootfs systemctl enable pacman-init
-cat systemd-firstboot.service > work/rootfs/usr/lib/systemd/system/systemd-firstboot.service
+chroot work/rootfs systemctl enable pacman-init
+chroot work/rootfs systemctl enable rc-local
+
 
 mkdir -p work/rootfs/home/vagrant/.ssh
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key" \

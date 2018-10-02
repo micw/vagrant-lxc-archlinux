@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mknod -m 666 /dev/ptmx c 5 2
+
